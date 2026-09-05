@@ -1,0 +1,44 @@
+@startuml expressorder_actividad_checkout
+
+skinparam ActivityBackgroundColor White
+skinparam swimlaneWidth 260
+
+|Cliente|
+start
+:Explorar catálogo y categorías;
+
+repeat
+  :Agregar producto al carrito;
+repeat while (¿Agregar más productos?) is (Sí) not (No)
+
+if (¿Carrito vacío?) then (Sí)
+  :Mostrar aviso: agregar\nproductos para continuar;
+  stop
+else (No)
+endif
+
+:Proceder a realizar pedido;
+
+|Sistema|
+if (¿Sesión iniciada?) then (No)
+  |Cliente|
+  :Iniciar sesión / Registrarse\n(el carrito se conserva);
+  |Sistema|
+else (Sí)
+endif
+
+|Cliente|
+repeat
+  :Seleccionar horario de retiro\n(o ajustar carrito si aplica);
+  |Sistema|
+  :Verificar disponibilidad del horario\ny stock de productos\n(misma transacción);
+repeat while (¿Horario y stock disponibles?) is (No) not (Sí)
+
+|Sistema|
+:Crear pedido, generar código de retiro\ny descontar stock y cupo del horario;
+
+|Cliente|
+:Ver confirmación del pedido\ncon código de retiro;
+stop
+
+@enduml

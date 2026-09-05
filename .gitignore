@@ -1,0 +1,17 @@
+# Dependencias
+/vendor/
+node_modules/
+
+# Configuración local / credenciales
+.env
+config/local.php
+*.local.php
+
+# Archivos de XAMPP / sistema
+*.log
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

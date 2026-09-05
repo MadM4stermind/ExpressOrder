@@ -1,0 +1,73 @@
+@startuml expressorder_casos_de_uso
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor White
+}
+skinparam note {
+  BackgroundColor #FFFAE6
+  BorderColor #999999
+}
+
+actor Cliente
+actor "Personal de Tienda / Staff" as Staff
+actor Administrador
+
+Administrador --|> Staff
+
+rectangle "Sistema de Pedidos / Pickup app expressorder" {
+  usecase "Registrarse" as UC_Registro
+  usecase "Iniciar Sesión / Autenticarse" as UC_Login
+  usecase "Explorar Catálogo y Categorías" as UC_Catalogo
+  usecase "Gestionar Carrito" as UC_Carrito
+  usecase "Seleccionar Slot / Horario de Retiro" as UC_Slot
+  usecase "Realizar Pedido (con Código de Retiro)" as UC_Pedido
+  usecase "Ver Historial de Pedidos" as UC_Historial
+  usecase "Cancelar Pedido" as UC_Cancelar
+  usecase "Atender Pedidos" as UC_Atender
+  usecase "Cambiar Estado de Pedidos" as UC_CambiarEstado
+  usecase "Verificar Código de Retiro" as UC_Verificar
+  usecase "Gestionar Productos y Categorías" as UC_Productos
+  usecase "Gestionar Horarios y Capacidad Pickup" as UC_Horarios
+}
+
+' -- Asociaciones actor -> caso de uso base --
+Cliente -- UC_Registro
+Cliente -- UC_Login
+Cliente -- UC_Catalogo
+Cliente -- UC_Pedido
+Cliente -- UC_Historial
+Cliente -- UC_Cancelar
+
+Staff -- UC_Login
+Staff -- UC_Atender
+
+Administrador -- UC_Login
+Administrador -- UC_Productos
+Administrador -- UC_Horarios
+
+' -- Flujo de compra: Carrito y Slot son requisitos EN PARALELO --
+' -- (el orden real de uso se documenta en el diagrama de actividades) --
+UC_Carrito .> UC_Catalogo : <<include>>
+UC_Pedido .> UC_Carrito : <<include>>
+UC_Pedido .> UC_Slot : <<include>>
+UC_Pedido .> UC_Login : <<include>>
+
+' -- Flujo de staff: cambiar estado requiere haber revisado el pedido --
+UC_CambiarEstado .> UC_Atender : <<include>>
+UC_CambiarEstado .> UC_Verificar : <<include>>
+UC_Atender .> UC_Login : <<include>>
+
+' -- Extend: cancelar es una rama opcional del historial --
+UC_Cancelar .> UC_Historial : <<extend>>
+
+note right of UC_Login
+  <<include>> también desde:
+  • Ver Historial de Pedidos
+  • Cancelar Pedido
+  • Gestionar Productos y Categorías
+  • Gestionar Horarios y Capacidad Pickup
+end note
+
+@enduml

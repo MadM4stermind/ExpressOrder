@@ -4,7 +4,7 @@ node_modules/
 
 # Configuración local / credenciales
 .env
-config/local.php
+src/config/local.php
 *.local.php
 
 # Archivos de XAMPP / sistema

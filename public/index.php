@@ -30,6 +30,26 @@ $router->get('/registrarse', [AuthController::class, 'mostrarFormularioRegistro'
 $router->post('/registrarse', [AuthController::class, 'registrar']);
 $router->get('/iniciar-sesion', [AuthController::class, 'mostrarFormularioLogin']);
 $router->post('/iniciar-sesion', [AuthController::class, 'login']);
+$router->get('/cerrar-sesion', [AuthController::class, 'logout']);
+
+// Destino post-login para staff/admin (RF05: valida el rol en el propio endpoint,
+// no solo en el login) — placeholder hasta que se implemente el panel real (Sprint 3).
+$router->get('/panel', function () {
+    $rol = $_SESSION['usuario_rol'] ?? null;
+
+    if ($rol === null) {
+        header('Location: ' . BASE_PATH . '/iniciar-sesion');
+        exit;
+    }
+
+    if (!in_array($rol, ['staff', 'admin'], true)) {
+        http_response_code(403);
+        echo 'No tienes permiso para ver esta página.';
+        return;
+    }
+
+    echo 'Panel de ' . htmlspecialchars($rol) . ' — pendiente de implementar (Sprint 3).';
+});
 
 // --- Despacho ---
 $uri = $_SERVER['REQUEST_URI'];

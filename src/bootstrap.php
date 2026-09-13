@@ -27,6 +27,9 @@ if (!file_exists($localConfig)) {
 }
 require $localConfig;
 
+// Sesión — necesaria para login (HU02) y mensajes flash (ej. tras registrarse)
+session_start();
+
 // Mientras estamos en desarrollo, mostrar errores ayuda a depurar.
 // TODO: desactivar display_errors antes de cualquier entrega/demo pública.
 ini_set('display_errors', '1');

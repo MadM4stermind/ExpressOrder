@@ -5,6 +5,7 @@ require __DIR__ . '/../src/bootstrap.php';
 use App\Core\Router;
 use App\Config\Database;
 use App\Controllers\AuthController;
+use App\Controllers\CatalogoController;
 
 // BASE_PATH = prefijo de carpeta donde vive el proyecto dentro de htdocs
 // (ej. "/expressorder/public"). La usan los controladores para redirigir
@@ -14,9 +15,10 @@ define('BASE_PATH', $scriptDir);
 
 $router = new Router();
 
-// Ruta de prueba — confirma que el router funciona
+// La raíz ahora manda directo al catálogo — ya no hace falta la ruta de prueba.
 $router->get('/', function () {
-    echo 'ExpressOrder — estructura base funcionando 🚀';
+    header('Location: ' . BASE_PATH . '/catalogo');
+    exit;
 });
 
 // Ruta de prueba — confirma que la conexión PDO a MySQL funciona
@@ -25,15 +27,17 @@ $router->get('/test-db', function () {
     echo '✅ Conexión a la base de datos exitosa.';
 });
 
-// Rutas de autenticación
+// Catálogo — HU03
+$router->get('/catalogo', [CatalogoController::class, 'index']);
+
+// Autenticación
 $router->get('/registrarse', [AuthController::class, 'mostrarFormularioRegistro']);
 $router->post('/registrarse', [AuthController::class, 'registrar']);
 $router->get('/iniciar-sesion', [AuthController::class, 'mostrarFormularioLogin']);
 $router->post('/iniciar-sesion', [AuthController::class, 'login']);
 $router->get('/cerrar-sesion', [AuthController::class, 'logout']);
 
-// Destino post-login para staff/admin (RF05: valida el rol en el propio endpoint,
-// no solo en el login) — placeholder hasta que se implemente el panel real (Sprint 3).
+// Destino post-login para staff/admin — placeholder hasta Sprint 3.
 $router->get('/panel', function () {
     $rol = $_SESSION['usuario_rol'] ?? null;
 

@@ -6,6 +6,12 @@ use App\Core\Router;
 use App\Config\Database;
 use App\Controllers\AuthController;
 
+// BASE_PATH = prefijo de carpeta donde vive el proyecto dentro de htdocs
+// (ej. "/expressorder/public"). La usan los controladores para redirigir
+// y las vistas para armar los <form action="..."> y los links.
+$scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+define('BASE_PATH', $scriptDir);
+
 $router = new Router();
 
 // Ruta de prueba — confirma que el router funciona
@@ -19,20 +25,37 @@ $router->get('/test-db', function () {
     echo '✅ Conexión a la base de datos exitosa.';
 });
 
-// Rutas de autenticación (controlador con stubs, listas para implementar HU01/HU02)
+// Rutas de autenticación
 $router->get('/registrarse', [AuthController::class, 'mostrarFormularioRegistro']);
 $router->post('/registrarse', [AuthController::class, 'registrar']);
 $router->get('/iniciar-sesion', [AuthController::class, 'mostrarFormularioLogin']);
 $router->post('/iniciar-sesion', [AuthController::class, 'login']);
+$router->get('/cerrar-sesion', [AuthController::class, 'logout']);
+
+// Destino post-login para staff/admin (RF05: valida el rol en el propio endpoint,
+// no solo en el login) — placeholder hasta que se implemente el panel real (Sprint 3).
+$router->get('/panel', function () {
+    $rol = $_SESSION['usuario_rol'] ?? null;
+
+    if ($rol === null) {
+        header('Location: ' . BASE_PATH . '/iniciar-sesion');
+        exit;
+    }
+
+    if (!in_array($rol, ['staff', 'admin'], true)) {
+        http_response_code(403);
+        echo 'No tienes permiso para ver esta página.';
+        return;
+    }
+
+    echo 'Panel de ' . htmlspecialchars($rol) . ' — pendiente de implementar (Sprint 3).';
+});
 
 // --- Despacho ---
-// Quitamos el prefijo de carpeta (ej. /expressorder/public) para que las rutas
-// de arriba funcionen igual sin importar dónde esté clonado el proyecto en htdocs.
-$scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
 $uri = $_SERVER['REQUEST_URI'];
 
-if ($scriptDir !== '' && str_starts_with($uri, $scriptDir)) {
-    $uri = substr($uri, strlen($scriptDir));
+if (BASE_PATH !== '' && str_starts_with($uri, BASE_PATH)) {
+    $uri = substr($uri, strlen(BASE_PATH));
 }
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $uri === '' ? '/' : $uri);

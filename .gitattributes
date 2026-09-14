@@ -1,0 +1,9 @@
+# Normaliza los saltos de línea a LF dentro del repo,
+# sin importar si el que edita está en Windows, Mac o Linux.
+* text=auto eol=lf
+
+# Los archivos binarios nunca se tocan (evita que Git intente "arreglarles" los saltos de línea)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.zip binary

@@ -21,6 +21,7 @@
         if (!badge) return;
 
         if (totalItems > 0) {
+            // Redondeo a 2 decimales por si acumulan libras/kg fraccionarios
             badge.textContent = Math.round(totalItems * 100) / 100;
             badge.classList.remove('d-none');
         } else {

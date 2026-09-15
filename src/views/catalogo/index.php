@@ -11,7 +11,15 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="<?= BASE_PATH ?>/catalogo">ExpressOrder</a>
-        <div class="d-flex ms-auto">
+
+        <div class="d-flex align-items-center ms-auto">
+            <span class="text-white me-3 position-relative">
+                🛒
+                <span id="carrito-contador"
+                      class="badge bg-danger rounded-pill position-absolute d-none"
+                      style="top: -8px; left: 16px; font-size: 0.65rem;"></span>
+            </span>
+
             <?php if (!empty($_SESSION['usuario_nombre'])): ?>
                 <span class="navbar-text text-white me-3">
                     Hola, <?= htmlspecialchars($_SESSION['usuario_nombre']) ?>
@@ -50,7 +58,13 @@
                 <p class="text-muted">No hay productos disponibles en esta categoría.</p>
             <?php else: ?>
                 <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <?php foreach ($productos as $producto): ?>
+                    <?php foreach ($productos as $producto):
+                        $esPorPeso = in_array($producto['unidad_medida'], ['lb', 'kg'], true);
+                        $step = $esPorPeso ? '0.25' : '1';
+                        $min = $esPorPeso ? '0.25' : '1';
+                        $valorInicial = $esPorPeso ? '0.5' : '1';
+                        $inputId = 'cantidad-' . (int) $producto['id'];
+                    ?>
                         <div class="col">
                             <div class="card h-100">
                                 <div class="card-body d-flex flex-column">
@@ -61,10 +75,29 @@
                                     <p class="card-text flex-grow-1">
                                         <?= htmlspecialchars($producto['descripcion'] ?? '') ?>
                                     </p>
-                                    <p class="fw-bold mb-0">
+                                    <p class="fw-bold mb-2">
                                         RD$ <?= number_format((float) $producto['precio'], 2) ?>
                                         / <?= htmlspecialchars($producto['unidad_medida']) ?>
                                     </p>
+
+                                    <div class="input-group input-group-sm">
+                                        <input type="number"
+                                               id="<?= $inputId ?>"
+                                               class="form-control"
+                                               value="<?= $valorInicial ?>"
+                                               min="<?= $min ?>"
+                                               step="<?= $step ?>"
+                                               aria-label="Cantidad en <?= htmlspecialchars($producto['unidad_medida']) ?>">
+                                        <button type="button"
+                                                class="btn btn-primary btn-agregar-carrito"
+                                                data-id="<?= (int) $producto['id'] ?>"
+                                                data-nombre="<?= htmlspecialchars($producto['nombre']) ?>"
+                                                data-precio="<?= (float) $producto['precio'] ?>"
+                                                data-unidad="<?= htmlspecialchars($producto['unidad_medida']) ?>"
+                                                data-cantidad-input="<?= $inputId ?>">
+                                            Agregar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -75,5 +108,6 @@
     </div>
 </div>
 
+<script src="<?= BASE_PATH ?>/js/carrito.js"></script>
 </body>
 </html>
